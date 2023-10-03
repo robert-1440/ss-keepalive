@@ -1,0 +1,31 @@
+type: lambda-layer
+
+#
+# Name of our resource
+#
+name: main-layer
+
+#
+# Name of the layer when deploying to AWS
+#
+layer-name: ss-keepalive-support
+
+#
+# Description of the layer as sent to AWS
+#
+description: Contains 3rd party packages needed by ss-keepalive
+
+
+zip-file: "${layer-zip-file}"
+
+architectures: [ "x86_64" ]
+
+
+#
+# Compatible runtimes
+# Options can be found here: https://docs.aws.amazon.com/lambda/latest/dg/API_PublishLayerVersion.html#SSS-PublishLayerVersion-request-CompatibleRuntimes
+#
+runtimes:
+  - python3.11
+
+

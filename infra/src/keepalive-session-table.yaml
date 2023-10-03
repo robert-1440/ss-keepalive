@@ -1,0 +1,15 @@
+type: dynamodb-table
+
+name: SSKeepaliveSession
+
+attributes:
+  - name: sessionId
+    type: S
+
+keys:
+  hash: sessionId
+
+ttl-attribute: expireTime
+
+pay-per-request: true
+

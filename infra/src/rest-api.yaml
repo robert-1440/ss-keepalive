@@ -1,0 +1,11 @@
+type: rest-api
+
+name: ss-webhooks
+
+description: Social Studio Keepalive Services
+
+gateway-domain: ${gatewayDomainName:ss-gateway}
+
+base-path: ss
+
+resources: {}

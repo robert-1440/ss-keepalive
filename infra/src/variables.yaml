@@ -1,0 +1,27 @@
+#
+# Note that variable types default to string
+#
+type: variables
+
+variables:
+
+  - name: lambda_enabled
+    description: Whether the lambda is enabled.
+    export: true
+    default: true
+
+  - name: lambda_memory_size
+    description: Memory size to allocate for lambda (in megabytes)
+    export: true
+    default: 512
+
+  - name: domain_name
+    description: The domain name to use.
+    export: true
+
+  - name: cert_arn
+    description: The ARN of the ACM certificate to use for API Gateway.
+    export: true
+
+
+

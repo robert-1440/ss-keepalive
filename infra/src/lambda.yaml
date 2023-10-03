@@ -1,0 +1,70 @@
+#
+# Describes the Lambda Function
+#
+
+type: lambda-function
+
+name: ssKeepaliveService
+
+description: "Social Studio Keepalive Service"
+
+#
+# Variable to use to indicate whether this lambda is enabled.
+#
+enabled-var: var.lambda_enabled
+
+#
+# The zip file that contains the code. Hopefully we can keep this such that id does not need any
+# 3rd party libraries so we do not have to build an image.
+#
+zip-file: "${lambda-zip-file}"
+
+runtime: python3.11
+
+handler: app.handler
+
+#
+# Memory size in megabytes
+#
+memory-size: var.lambda_memory_size
+
+
+#
+# Ephemeral storage size in megabytes
+#
+ephemeral-storage: 512
+
+#
+# Time-out, in minutes:seconds, or seconds.
+# i.e.
+# "15:00" - 15 minutes.
+#      10 - 10 seconds.
+#
+timeout: 90
+
+#
+# Log retention for the log group, in days.
+#
+log-retention-days: 30
+
+layers: [ "main-layer" ]
+
+permissions:
+
+  secrets:
+    - name: ss-keepalive/*
+      actions:
+        - GetSecretValue
+
+  dynamodb-tables:
+    - table: SSKeepaliveSession
+      actions:
+        - GetItem
+        - PutItem
+        - UpdateItem
+        - DeleteItem
+
+
+environment:
+  variables:
+    CONFIG_SERVICE_URL: ${configServiceUrl:null}

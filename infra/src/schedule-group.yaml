@@ -1,0 +1,21 @@
+type: schedule-group
+
+name: notification-group
+
+#
+# The name as it will appear in AWS.
+#
+group-name: NotificationGroup
+
+#
+# Name of the environment variable to set the name to.
+#
+env-var-name: SCHEDULE_GROUP
+
+#
+# Indicate the lambda to be invoked. Used for creating the appropriate role.
+#
+lambda: ssKeepaliveService
+
+
+

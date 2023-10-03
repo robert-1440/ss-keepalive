@@ -1,0 +1,4 @@
+type: aws-config
+
+default-tags:
+  sska-1440: 1

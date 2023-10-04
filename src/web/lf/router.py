@@ -1,11 +1,13 @@
 from enum import Enum
-from typing import Callable, Dict, Optional, Tuple, Any
+from typing import Callable, Dict, Optional, Tuple, Any, Collection
 
 from instance import Instance
 from request import HttpRequest, Response, NotFoundException, \
     MethodNotAllowedException
+from utils import loghelper
 from utils.path_utils import Path
 
+logger = loghelper.get_logger(__name__)
 
 class Method(Enum):
     GET = 0,
@@ -20,7 +22,7 @@ class Method(Enum):
 
 class _Route:
     def __init__(self, path: str, method: Method, caller: Callable,
-                 response_codes: Tuple[int]):
+                 response_codes: Collection[int]):
         self.has_query_params = path.endswith("?")
         if self.has_query_params:
             path = path[0:len(path) - 1:]
@@ -64,7 +66,7 @@ def __find_full_route(path: str, method: str) -> Optional[Tuple[_Route, Dict[str
 
 
 def add_route(path: str, method: Method, caller: Callable,
-              response_codes: Tuple[int]):
+              response_codes: Collection[int]):
     key = f"{method.name}:{path}"
     if key in _routes:
         raise AssertionError(f"{key} route has already been added.")
@@ -77,7 +79,7 @@ def process(instance: Instance, request: HttpRequest):
     if result is None:
         f = __find_route(path)
         if f is None:
-            print(f"Unable to find {path}")
+            logger.info(f"Unable to find {path}")
             raise NotFoundException()
         else:
             raise MethodNotAllowedException()

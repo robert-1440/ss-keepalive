@@ -69,7 +69,7 @@ $(DIST)layer.zip: Dockerfile
 	@cd $(DIST) ; zip -r layer.zip python
 
 
-build-terraform bt:
+build-terraform bt: layer
 	 @$(BUILDER_CMD) --var region=$(REGION) \
 			--var region-var=aws_region \
 			--var project=$(PROJECT) --create --path $(OUTPUT_PATH) \

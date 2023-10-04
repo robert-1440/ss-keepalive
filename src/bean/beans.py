@@ -1,4 +1,5 @@
 import functools
+import os
 import sys
 from threading import RLock
 from typing import Union, Callable, Any, Dict, Collection
@@ -10,13 +11,26 @@ from bean import BeanName, Bean
 BeanValue = Union[Callable, Any]
 
 
+class _Boto3Loader:
+    def __init__(self, service: str):
+        self.service = service
+
+    def invoke(self) -> Any:
+        return boto3.client(self.service)
+
+
 class _LazyLoader:
-    def __init__(self, name: str, bean_names: Union[Collection[BeanName], BeanName] = None):
+    def __init__(self, name: str,
+                 bean_names: Union[Collection[BeanName], BeanName] = None,
+                 tag_as_lazy: bool = True):
         if bean_names is not None and isinstance(bean_names, BeanName):
             bean_names = (bean_names,)
         self.name = name
         self.bean_names = bean_names
         self.init_function = None
+        # Note: when tag as lazy is False, don't include it in load_all_lazy()
+        # Should be used on beans that make callouts
+        self.tag_as_lazy = tag_as_lazy
 
     def invoke(self) -> Any:
         if self.init_function is None:
@@ -39,11 +53,13 @@ class _BeanImpl(Bean):
         self.__initialized = False
         self.__value = None
         self.__mutex = RLock()
-        self.__lazy = isinstance(initializer, _LazyLoader)
+        self.__lazy = isinstance(initializer, _LazyLoader) and initializer.tag_as_lazy
 
     def __initialize(self):
         initializer = self.__override_initializer if self.__override_initializer else self.__initializer
         if isinstance(initializer, _LazyLoader):
+            self.__value = initializer.invoke()
+        elif isinstance(initializer, _Boto3Loader):
             self.__value = initializer.invoke()
         elif callable(initializer):
             self.__value = initializer()
@@ -76,10 +92,19 @@ class _BeanImpl(Bean):
 __BEANS: Dict[BeanName, _BeanImpl] = {
     BeanName.DYNAMODB: _BeanImpl(_LazyLoader('dynamodb')),
     BeanName.INSTANCE: _BeanImpl(_LazyLoader('instance')),
-    BeanName.DYNAMODB_CLIENT: _BeanImpl(lambda: boto3.client('dynamodb')),
-    BeanName.SECRETS_MANAGER_CLIENT: _BeanImpl(lambda: boto3.client('secretsmanager')),
+    BeanName.SCHEDULER_CLIENT: _BeanImpl(_Boto3Loader('scheduler')),
+    BeanName.DYNAMODB_CLIENT: _BeanImpl(_Boto3Loader('dynamodb')),
+    BeanName.SECRETS_MANAGER_CLIENT: _BeanImpl(_Boto3Loader('secretsmanager')),
     BeanName.SECRETS_REPO: _BeanImpl(_LazyLoader('secrets_repo')),
-    BeanName.SESSION_REPO: _BeanImpl(_LazyLoader('session_repo'))
+    BeanName.SESSION_REPO: _BeanImpl(_LazyLoader('session_repo')),
+    BeanName.SCHEDULER: _BeanImpl(_LazyLoader('scheduler')),
+    BeanName.WEB_ROUTER: _BeanImpl(_LazyLoader('web')),
+    BeanName.INTERNAL_ROUTER: _BeanImpl(_LazyLoader('internal')),
+    BeanName.GCP_CREDS: _BeanImpl(_LazyLoader('gcp_creds', tag_as_lazy=False)),
+    BeanName.FIREBASE_ADMIN: _BeanImpl(_LazyLoader('firebase')),
+    BeanName.PUSH_NOTIFIER: _BeanImpl(_LazyLoader('push_notifier')),
+    BeanName.NOTIFIER: _BeanImpl(_LazyLoader('notifier')),
+    BeanName.SNS_CLIENT: _BeanImpl(_Boto3Loader('sns'))
 }
 
 
@@ -88,7 +113,7 @@ def override_bean(name: BeanName, value: BeanValue):
     This should be used for testing only.
 
     :param name: the bean name.
-    :param value:  the value for the bean.
+    :param value: the value for the bean.
     """
     assert isinstance(name, BeanName)
     b = __BEANS[name]

@@ -1,21 +1,18 @@
-import json
-from typing import Optional, Union
-
 import abc
+import json
+from typing import Optional, Union, Any, Dict
 
 
 class GcpCredentials:
-    def __init__(self, project_id: str,
-                 private_key: str):
-        self.project_id = project_id
-        self.private_key = private_key
+    def __init__(self, content: Dict[str, Any]):
+        self.content = content
 
     @classmethod
     def from_json(cls, data: Optional[Union[str, dict]]):
         if data is None:
             return None
         record = data if isinstance(data, dict) else json.loads(data)
-        return GcpCredentials(record['projectId'], record['privateKey'])
+        return GcpCredentials(record)
 
 
 class SecretsRepo(metaclass=abc.ABCMeta):

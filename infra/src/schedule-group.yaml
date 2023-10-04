@@ -8,9 +8,10 @@ name: notification-group
 group-name: NotificationGroup
 
 #
-# Name of the environment variable to set the name to.
+# Name of the environment variable to hold the schedule group name.
+# The role arn env name will be env-var-name_ROLE_ARN.
 #
-env-var-name: SCHEDULE_GROUP
+env-var-name: SS_KEEPALIVE_SCHEDULE_GROUP
 
 #
 # Indicate the lambda to be invoked. Used for creating the appropriate role.

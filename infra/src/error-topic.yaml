@@ -1,0 +1,14 @@
+type: topic
+
+name: keepalive-error
+
+topic-name: ss-keepalive-error
+
+display-name: Topic for errors encountered by the keepalive service.
+
+env-name: SS_KEEPALIVE_ERROR_TOPIC_ARN
+
+#
+# Set to true if the service should be able to manage subscriptions to the topic
+#
+manage-subscriptions: false

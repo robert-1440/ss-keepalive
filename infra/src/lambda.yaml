@@ -9,13 +9,7 @@ name: ssKeepaliveService
 description: "Social Studio Keepalive Service"
 
 #
-# Variable to use to indicate whether this lambda is enabled.
-#
-enabled-var: var.lambda_enabled
-
-#
-# The zip file that contains the code. Hopefully we can keep this such that id does not need any
-# 3rd party libraries so we do not have to build an image.
+# The zip file that contains the code.
 #
 zip-file: "${lambda-zip-file}"
 
@@ -63,6 +57,12 @@ permissions:
         - PutItem
         - UpdateItem
         - DeleteItem
+
+  topics:
+    - name: keepalive-error
+      actions:
+        - "sns:Publish"
+
 
 
 environment:

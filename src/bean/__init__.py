@@ -12,6 +12,13 @@ class BeanName(Enum):
     SCHEDULER_CLIENT = 5
     SECRETS_REPO = 6
     SESSION_REPO = 7
+    WEB_ROUTER = 8
+    INTERNAL_ROUTER = 9
+    GCP_CREDS = 10
+    FIREBASE_ADMIN = 11
+    PUSH_NOTIFIER = 12
+    NOTIFIER = 13
+    SNS_CLIENT = 14
 
 
 class Bean(metaclass=abc.ABCMeta):

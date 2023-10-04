@@ -10,7 +10,7 @@ class AwsSecretsRepo(SecretsRepo):
         self.client = client
 
     def find_gcp_credentials(self) -> Optional[GcpCredentials]:
-        return GcpCredentials.from_json(self.__get_secret_value("ss-keepalive/GcpCredentials"))
+        return GcpCredentials.from_json(self.__get_secret_value("ss-keepalive/GcpCertificate"))
 
     def __get_secret_value(self, name: str) -> Optional[str]:
         try:

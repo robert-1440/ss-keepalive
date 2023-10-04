@@ -1,6 +1,7 @@
 type: rest-api
+ignore: true
 
-name: ss-webhooks
+name: ss-keepalive
 
 description: Social Studio Keepalive Services
 
@@ -8,4 +9,4 @@ gateway-domain: ${gatewayDomainName:ss-gateway}
 
 base-path: ss
 
-resources: {}
+resources: []

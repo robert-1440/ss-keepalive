@@ -6,13 +6,13 @@ from types import ModuleType
 from typing import Any, Optional, Set
 from zipfile import ZipFile
 
-from bean import beans
 
 src_name = os.path.realpath(f"{__file__}/../src")
 if src_name not in sys.path:
     sys.path.insert(0, src_name)
 
 import app
+from bean import beans
 
 verbose = False
 

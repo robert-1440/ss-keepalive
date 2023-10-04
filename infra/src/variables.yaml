@@ -5,11 +5,6 @@ type: variables
 
 variables:
 
-  - name: lambda_enabled
-    description: Whether the lambda is enabled.
-    export: true
-    default: true
-
   - name: lambda_memory_size
     description: Memory size to allocate for lambda (in megabytes)
     export: true

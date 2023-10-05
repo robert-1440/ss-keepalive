@@ -8,11 +8,6 @@ from scheduler import Scheduler
 _FLEX_WINDOW = {"Mode": "OFF"}
 
 
-def _format_time(seconds: int) -> str:
-    t = datetime.utcnow() + timedelta(seconds=seconds)
-    return f"at({t.year}-{t.month:02d}-{t.day:02d}T{t.hour:02d}:{t.minute:02d}:{t.second:02d})"
-
-
 def _format_rate(minutes: int) -> str:
     return f"rate({minutes} minutes)"
 
@@ -61,11 +56,6 @@ class AwsScheduler(Scheduler):
             if is_conflict_exception(ex):
                 return False
             raise ex
-        return True
-
-    def update_schedule(self, function_arn: str, session_id: str, seconds_interval: int):
-        params = self._build_params(function_arn, session_id, seconds_interval)
-        self.client.update_schedule(**params)
         return True
 
     def delete_schedule(self, session_id: str):

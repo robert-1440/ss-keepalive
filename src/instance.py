@@ -65,6 +65,7 @@ class Instance:
             return True
         except Exception:
             logger.error(f"Failed to notify error: {exception_utils.dump_ex()}")
+            return False
 
     def create_session(self, session: Session) -> bool:
         return self.__session_repo.create_session(session, _TTL_SECONDS)

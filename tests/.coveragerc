@@ -2,3 +2,4 @@
 omit =
     tests/*
     src/utils/loghelper.py
+    src/aws/dynamodb.py

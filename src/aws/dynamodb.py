@@ -375,20 +375,16 @@ class DynamoDb:
             self.__thread_local.last_response = DynamoResponse(start, resp, self.__thread_local.throttle_count)
         return resp
 
-    def find_item(self, table_name: str, keys: dict, consistent: bool = False, attributes_to_get=None):
+    def find_item(self, table_name: str, keys: dict, consistent: bool = False):
         try:
-            return self.get_item(table_name, keys, consistent, attributes_to_get)
+            return self.get_item(table_name, keys, consistent)
         except ResourceNotFoundException:
             return None
 
-    def get_item(self, table_name: str, keys: dict, consistent: bool = False, attributes_to_get=None):
+    def get_item(self, table_name: str, keys: dict, consistent: bool = False):
         ddb_keys = _to_ddb_item(keys)
         params = {"TableName": table_name,
                   "Key": ddb_keys}
-        if attributes_to_get is not None and len(attributes_to_get) > 0:
-            if type(attributes_to_get) is tuple:
-                attributes_to_get = list(attributes_to_get)
-            params['AttributesToGet'] = attributes_to_get
 
         if consistent:
             params['ConsistentRead'] = True
@@ -490,82 +486,3 @@ class DynamoDb:
     def transact_write(self, items: List[TransactionRequest]):
         item_list = list(map(lambda item: item.to_ddb_request(), items))
         return self._execute_and_wrap(lambda: self.__client.transact_write_items(TransactItems=item_list))
-
-    def scan(self, table_name: str, select_attributes: str = None):
-
-        props = {'TableName': table_name}
-        if select_attributes is None:
-            props['Select'] = "ALL_ATTRIBUTES"
-        else:
-            props["ProjectionExpression"] = select_attributes
-
-        def query_function(next_key: dict):
-            if next_key is None:
-                response = self.__client.scan(**props)
-            else:
-                response = self.__client.scan(ExclusiveStartKey=next_key, **props)
-            items = response["Items"]
-            return items, response.get("LastEvaluatedKey")
-
-        return ResultSet(query_function)
-
-    def query(self, table_name: str,
-              partition_key_attribute: str,
-              partition_key_value: Any,
-              select_attributes: str = None):
-        props = {'TableName': table_name}
-        if select_attributes is None:
-            props['Select'] = "ALL_ATTRIBUTES"
-        else:
-            props["ProjectionExpression"] = select_attributes
-
-        att_name, att_value = _to_attribute_value(partition_key_value)
-        props['KeyConditionExpression'] = f"{partition_key_attribute} = :keyval"
-        props['ExpressionAttributeValues'] = {':keyval': {att_name: att_value}}
-
-        def query_function(next_key: dict):
-            if next_key is None:
-                response = self.__client.query(**props)
-            else:
-                response = self.__client.query(ExclusiveStartKey=next_key, **props)
-            items = response["Items"]
-            return items, response.get("LastEvaluatedKey")
-
-        return ResultSet(query_function)
-
-
-class ResultSet:
-    def __init__(self, query_function):
-        self.__query_function = query_function
-        self.__next_key = None
-        self.__items = None
-        self.__counter = 0
-        self.__done = False
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if not self.has_next():
-            raise StopIteration()
-        return self.next()
-
-    def has_next(self):
-        if self.__done:
-            return False
-        if self.__items is None or self.__counter == len(self.__items):
-            if self.__items is None or self.__next_key is not None:
-                self.__items, self.__next_key = self.__query_function(self.__next_key)
-                if len(self.__items) > 0:
-                    self.__counter = 0
-                    return True
-            self.__done = True
-            return False
-        return True
-
-    def next(self) -> Dict[str, Any]:
-        if not self.has_next():
-            raise Exception("No more")
-        item = _from_ddb_item(self.__items[self.__counter])
-        self.__counter += 1
-        return item

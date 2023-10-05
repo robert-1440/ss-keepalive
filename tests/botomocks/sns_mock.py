@@ -36,6 +36,11 @@ class MockSnsClient(BaseMockClient):
         super(MockSnsClient, self).__init__()
         self.notifications: List[Notification] = []
         self.subscriptions: List[MockSubscription] = []
+        self.__fail_on_next_publish = False
+        self.notify_error_count = 0
+
+    def set_fail_on_next_publish(self):
+        self.__fail_on_next_publish = True
 
     def pop_notification(self) -> Notification:
         return self.notifications.pop(0)
@@ -82,6 +87,10 @@ class MockSnsClient(BaseMockClient):
         subject = kwargs.pop("Subject")
         message = kwargs.pop("Message")
         assert_empty(kwargs)
+        if self.__fail_on_next_publish:
+            self.__fail_on_next_publish = False
+            self.notify_error_count += 1
+            raise AssertionError("Failed to publish.")
         self.notifications.append(Notification(topic_arn, subject, message))
 
     def list_subscriptions_by_topic(self, **kwargs):

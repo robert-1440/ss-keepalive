@@ -3,11 +3,15 @@ import time
 from datetime import datetime
 from typing import Optional
 
+import bean.beans
+from aws.dynamodb import DynamoDb
 from base_test import BaseTest, NOTIFICATION_GROUP, FUNCTION_ARN, SCHEDULE_ROLE_ARN
+from bean import BeanName
 from botomocks.scheduler_mock import Schedule
 from mocks.gcp.firebase_admin import messaging
 from session_repo import Session
 from utils import date_utils
+from utils.date_utils import get_system_time_in_seconds
 
 _DEFAULT_TOKEN = "ThisIsAnFcmToken"
 _DEFAULT_SESSION_ID = "this-is-a-session-id"
@@ -161,6 +165,18 @@ class SessionsTest(BaseTest):
         nn = self.pop_notification()
         self.assertIn("ValueError: Invalid token: ThisIsAnFcmToken", nn.message)
         self.assertEqual('Failed to send push notification', nn.subject)
+
+        # Now, test with it being expired
+        stamp = get_system_time_in_seconds() - 14410
+        ddb: DynamoDb = bean.beans.get_bean_instance(BeanName.DYNAMODB)
+        ddb.update_item("SSKeepaliveSession",
+                        keys={"sessionId": _DEFAULT_SESSION_ID},
+                        item={
+                            'expireTime': stamp
+                        })
+
+        self.invoke_lambda(s)
+        self.assertIsNone(self.find_schedule(_DEFAULT_SESSION_ID))
 
     ##############################################################################################
     # Support methods

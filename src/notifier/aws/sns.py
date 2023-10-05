@@ -1,13 +1,4 @@
-from typing import Any, Dict
-
-
-class Subscription:
-    def __init__(self, node: Dict[str, Any]):
-        self.arn = node['SubscriptionArn']
-        self.owner = node.get('Owner')
-        self.protocol = node.get('Protocol')
-        self.endpoint = node.get('Endpoint')
-        self.topic_arn = node.get("TopicArn")
+from typing import Any
 
 
 class Sns:

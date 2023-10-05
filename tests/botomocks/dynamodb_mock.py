@@ -886,7 +886,10 @@ class MockDynamoDbClient:
     def get_item(self, **kwargs):
         table_name = kwargs.pop('TableName')
         key = kwargs.pop('Key')
-        kwargs.pop("ConsistentRead", None)
+
+        # All of our reads should be consistent
+        assert kwargs.pop("ConsistentRead"), "Expecting consistent read"
+
         if len(kwargs) != 0:
             raise AssertionError(f"Unrecognized properties: {','.join(kwargs.keys())}")
 

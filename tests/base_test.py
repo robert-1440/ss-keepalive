@@ -8,14 +8,12 @@ from better_test_case import BetterTestCase
 from botomocks.dynamodb_mock import MockDynamoDbClient, KeyPart, KeyDefinition
 from botomocks.scheduler_mock import MockSchedulerClient
 from botomocks.sm_mock import MockSecretsManagerClient
-from botomocks.sns_mock import MockSnsClient
+from botomocks.sns_mock import MockSnsClient, Notification
 from instance import Instance
 import json
 
 from mocks.gcp import firebase_admin
 from mocks.gcp.firebase_admin import messaging
-from mocks.mock_notifier import MockNotifier
-from mocks.mock_push_notifier import MockPushNotifier
 
 from mocks.gcp.firebase_admin.messaging import Invocation
 
@@ -178,10 +176,10 @@ class BaseTest(BetterTestCase):
         messaging.assert_no_invocations()
 
     def assert_no_notifications(self):
-        self.fail("Implement me")
+        return self.sns_mock.assert_no_notifications()
 
-    def pop_notification(self):
-        self.fail("Implement me")
+    def pop_notification(self) -> Notification:
+        return self.sns_mock.pop_notification()
 
     @staticmethod
     def add_invalid_push_token(token: str):

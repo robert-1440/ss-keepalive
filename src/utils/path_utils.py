@@ -58,13 +58,17 @@ def encode_for_url(text: str) -> str:
     return urllib.parse.quote(text, safe='')
 
 
-def join_paths(*args) -> str:
+def join_paths(*args, allow_trailing_slash: bool = False) -> str:
     path = ""
     for arg in args:
         if len(path) > 0 and not path.endswith("/") and not arg.startswith("/"):
             path += "/"
         path += arg
-    return path.replace("//", "/")
+    path = path.replace("//", "/")
+    if not allow_trailing_slash and path.endswith("/"):
+        path = path[0:len(path) - 1:]
+
+    return path
 
 
 def join_base_path(*args) -> str:

@@ -3,10 +3,30 @@ ignore: true
 
 name: ss-keepalive
 
-description: Social Studio Keepalive Services
+description: Social Studio Keepalive Service
 
 gateway-domain: ${gatewayDomainName:ss-gateway}
 
 base-path: ss
 
-resources: []
+resources:
+  - path: sessions
+    methods:
+      - name: post-sessions
+        http-method: POST
+        lambda-function: ssKeepaliveService
+        response-codes: [ 204, 400, 401, 404, 409, 415, 500 ]
+
+  - path: sessions/{sessionId}/actions/keepalive
+    methods:
+      - name: post-sessions-actions-keepalive
+        http-method: POST
+        lambda-function: ssKeepaliveService
+        response-codes: [ 204, 401, 404, 410, 415, 500 ]
+
+  - path: sessions/{sessionId}
+    methods:
+      - name: delete-session
+        http-method: DELETE
+        lambda-function: ssKeepaliveService
+        response-codes: [ 204, 401, 404, 415, 500 ]

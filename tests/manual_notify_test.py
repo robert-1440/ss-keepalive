@@ -1,5 +1,4 @@
 import os
-import uuid
 
 from bean import beans, BeanName
 from instance import Instance
@@ -19,21 +18,33 @@ instance: Instance = beans.get_bean_instance(BeanName.INSTANCE)
 
 
 arn = "arn:aws:lambda:us-west-1:433933949595:function:ssKeepaliveService"
+instance.set_function_arn(arn)
 
 session_id = '727a6ed5-5bdf-4ed0-8bae-ecb8e20aef46'
+instance.delete_session(session_id)
 
-#session_id = str(uuid.uuid4())
+# session_id = str(uuid.uuid4())
 expire_time = get_system_time_in_seconds() + 120
 
 session = Session(
     session_id,
-    _TOKEN,30,
-    expire_time
+    _TOKEN, 30,
+    expire_time,
+    None,
+    0
 )
 
-result = instance.create_session(session)
+assert instance.create_session(session)
+
+db_session = instance.find_session(session.session_id)
+assert db_session is not None
+assert db_session.last_modified is not None
+assert db_session.state_counter == 0
+
+assert instance.delete_session(session_id)
+assert not instance.delete_session(session_id)
+
 instance.delete_schedule(session_id)
-# instance.create_schedule(arn, session_id, 120)
-
-
-
+instance.create_schedule(session_id, 60)
+instance.create_schedule(session_id, 60)
+instance.delete_schedule(session_id)

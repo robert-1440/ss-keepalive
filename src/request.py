@@ -40,6 +40,13 @@ class HttpRequest:
 
         self.__attributes = {}
 
+    def assert_empty_body(self):
+        if self.has_body():
+            raise BadRequestException("Expected an empty body.")
+
+    def has_body(self):
+        return self.body is not None and len(self.body) > 0
+
     def get_body_record(self) -> Dict[str, Any]:
         if self.__body_record is None:
             self.__body_record = json.loads(self.body)
@@ -106,6 +113,11 @@ class NotFoundException(HttpException):
         if resource is not None and len(resource) > 0:
             message += f": {resource}"
         super(NotFoundException, self).__init__(404, message)
+
+
+class GoneException(HttpException):
+    def __init__(self, message: str = None):
+        super(GoneException, self).__init__(410, message)
 
 
 class MethodNotAllowedException(HttpException):
@@ -227,6 +239,12 @@ class Response:
     def __init__(self, code: int, body: Any = None):
         self.code = code
         self.body = body
+
+    def to_dict(self) -> Dict[str, Any]:
+        record = {'statusCode': self.code}
+        if self.body is not None:
+            record['body'] = self.body
+        return record
 
     @classmethod
     def ok(cls, body: Any = None):

@@ -9,6 +9,7 @@ from utils.path_utils import Path
 
 logger = loghelper.get_logger(__name__)
 
+
 class Method(Enum):
     GET = 0,
     POST = 1,

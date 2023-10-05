@@ -10,6 +10,10 @@ def is_invalid_request(source: Exception) -> bool:
     return is_exception(source, 400, "InvalidRequestException")
 
 
+def is_conflict_exception(source: Exception) -> bool:
+    return is_exception(source, 409, "ConflictException")
+
+
 def is_exception(source: Exception, status: int, code: str):
     if hasattr(source, "response"):
         response = getattr(source, "response")

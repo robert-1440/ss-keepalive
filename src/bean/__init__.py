@@ -19,6 +19,7 @@ class BeanName(Enum):
     PUSH_NOTIFIER = 12
     NOTIFIER = 13
     SNS_CLIENT = 14
+    GCP_CERT_BUILDER = 15
 
 
 class Bean(metaclass=abc.ABCMeta):

@@ -101,10 +101,12 @@ __BEANS: Dict[BeanName, _BeanImpl] = {
     BeanName.WEB_ROUTER: _BeanImpl(_LazyLoader('web')),
     BeanName.INTERNAL_ROUTER: _BeanImpl(_LazyLoader('internal')),
     BeanName.GCP_CREDS: _BeanImpl(_LazyLoader('gcp_creds', tag_as_lazy=False)),
+    BeanName.GCP_CERT_BUILDER: _BeanImpl(_LazyLoader('gcp_cert_builder', tag_as_lazy=False)),
     BeanName.FIREBASE_ADMIN: _BeanImpl(_LazyLoader('firebase')),
     BeanName.PUSH_NOTIFIER: _BeanImpl(_LazyLoader('push_notifier')),
     BeanName.NOTIFIER: _BeanImpl(_LazyLoader('notifier')),
-    BeanName.SNS_CLIENT: _BeanImpl(_Boto3Loader('sns'))
+    BeanName.SNS_CLIENT: _BeanImpl(_Boto3Loader('sns')),
+
 }
 
 

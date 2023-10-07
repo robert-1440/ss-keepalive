@@ -64,5 +64,7 @@ def handler(event: dict, context: Any):
             r = r.to_dict()
         if isinstance(r, dict):
             r['isBase64Encoded'] = False
-            r = json.dumps(r)
+            body = r.get('body')
+            if body is not None and type(body) is dict:
+                r['body'] = json.dumps(body)
     return r

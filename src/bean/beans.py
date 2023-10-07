@@ -1,5 +1,4 @@
 import functools
-import os
 import sys
 from threading import RLock
 from typing import Union, Callable, Any, Dict, Collection
